@@ -1,40 +1,42 @@
-KRILLION 2.0 — INSTALLATION
+KRILLION 3.0 — INSTALLATION
 
-FILES
-- index.html: new game interface
-- migration_v2.sql: database migration
+WHAT'S INCLUDED
+- index.html: KRILLION 3.0 game interface
+- migration_v2.sql: original 2.0 database setup (only if starting fresh)
+- migration_v3.sql: additive 3.0 upgrade for an existing 2.0 project
 - README.txt: these instructions
 
-IMPORTANT FIRST
-This is an upgrade to your existing Supabase project. Run migration_v2.sql ONCE in the SQL Editor. It creates profiles, answer history, inventory, account setup trigger, scoring and shop purchase functions. Do not delete your old tables.
+UPGRADE AN EXISTING KRILLION 2.0 PROJECT
+1. Open your Supabase project → SQL Editor.
+2. Open migration_v3.sql from this repository.
+3. Copy the entire file into a new SQL query and run it ONCE.
+4. Do NOT delete your existing tables or run migration_v2.sql again.
+5. The upgrade adds profile customisation, follows, theme purchases and the updated scoring function. Existing accounts, answers, points, coins and inventory are kept.
 
-CONFIGURE THE WEBSITE
-1. Open index.html in Notepad or a code editor.
-2. Near the top of the script, replace:
-   https://YOUR_PROJECT_ID.supabase.co
-   with your Supabase Project URL (not the dashboard URL).
-3. Replace YOUR_SUPABASE_PUBLISHABLE_KEY with your sb_publishable_... key.
-4. Save index.html.
-5. Host the folder on a static hosting service (GitHub Pages, Netlify, Cloudflare Pages) and share that hosted URL.
+AVATAR UPLOADS
+The migration creates a public "avatars" Storage bucket. Uploaded images are limited to PNG, JPG or WEBP and 2 MB. Signed-in users can upload only into their own user-ID folder. Images are public so they can appear on player profiles.
 
-SUPABASE AUTH
-In Supabase Dashboard → Authentication → URL Configuration:
-- Set Site URL to your hosted website URL.
-- Add that same URL to Redirect URLs.
-For a quick test opened locally, email confirmation may require a hosted URL. Do not disable security settings casually.
+PUBLISH THE WEBSITE
+1. Replace the index.html file in your GitHub repository with the new version from this KRILLION 3.0 branch.
+2. Merge the KRILLION 3.0 pull request into main when you're ready.
+3. GitHub Pages should publish the updated site automatically. Keep the same website URL.
 
-GAME DESIGN NOTES
-- 10 games/day, 12 prompts each (120 total).
-- Everyone gets the same daily prompt sets. The current front-end rotates through a built-in 10x12 prompt bank deterministically by UTC date.
-- Player rarity: first matching answer receives a higher score; duplicate answers lose 15 player-rarity points per earlier matching player, down to a minimum.
-- “Internet rarity” is currently a transparent text-specificity estimate based on answer length and word count. It is NOT live internet search or a measured web popularity score. To make that genuine, connect a curated dataset or server-side popularity/search provider.
-- Combined score = 70% player rarity + 30% estimated internet rarity.
-- Coins are earned from points and spent on shop cosmetics.
-- Usernames, avatars, game answers, scores and purchased items persist in Supabase.
+SCORING
+- 70% niche-specificity estimate + 30% player rarity.
+- The niche score is a transparent text-specificity estimate using descriptive words, distinct words and answer detail. It is NOT live internet search or a measured web popularity score.
+- Player rarity starts at 100 and drops by 8 for each matching earlier player answer, to a floor of 40.
+- Combined score is rounded to the nearest whole point.
+- Scores are snapshots when submitted; later answers do not recalculate earlier scores.
 
-PROTOTYPE LIMITATIONS / SECURITY
-- This is a working starter, not a production-hardened competitive platform.
-- The SQL RPC enforces authentication and server-side scoring, but the prompt bank is client-side and the browser can be modified. Add server-side prompt validation, rate limits, anti-cheat checks and moderation before public launch.
-- Supabase email confirmation should be configured. Usernames are unique.
-- The first matching answer gets more points based on current submissions. Scores are snapshots at submission time; later matching answers do not automatically recalculate earlier players' scores.
-- All authenticated users can read answers for shared rarity. Avoid storing personal information in answers.
+NEW FEATURES
+- Follow and unfollow other players; search usernames and view public profiles.
+- Use preset emoji avatars or upload your own image.
+- Choose an avatar background colour.
+- Buy and equip original colour themes: Crimson Rush, Deep Ocean, Void Protocol, Nebula Drift and Cursed Pulse.
+- Themes are original designs inspired by broad space/anime colour moods, not official franchise art or branding.
+
+IMPORTANT
+- Run migration_v3.sql only once, after your existing 2.0 setup.
+- Keep the Supabase publishable/anon key in the frontend; never put a service-role/secret key in index.html.
+- Supabase Auth Site URL and Redirect URLs should continue to use your GitHub Pages URL.
+- The first public release is still a prototype. Add stronger anti-cheat, moderation and server-side prompt validation before treating scores as high-stakes competition.
