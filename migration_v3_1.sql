@@ -169,3 +169,31 @@ revoke all on function public.buy_krillion_theme(text) from public, anon;
 grant execute on function public.buy_krillion_theme(text) to authenticated;
 
 grant select on public.profiles to authenticated;
+
+-- Theme equipping is validated server-side; clients may only equip themes they own.
+-- The free default theme is always available.
+revoke update (equipped_theme) on public.profiles from authenticated;
+create or replace function public.equip_krillion_theme(p_sku text)
+returns void language plpgsql security definer set search_path=public
+as $$
+declare
+  v_uid uuid := auth.uid();
+begin
+  if v_uid is null then raise exception 'Sign in required'; end if;
+  if p_sku is null or p_sku not in (
+    'theme_default','theme_crimson','theme_ocean','theme_void','theme_nebula',
+    'theme_cursed','theme_arcade','theme_lab','theme_codex','theme_cyber','theme_mecha'
+  ) then
+    raise exception 'Unknown theme';
+  end if;
+  if p_sku <> 'theme_default' and not exists (
+    select 1 from public.inventory
+    where user_id=v_uid and sku=p_sku and kind='theme'
+  ) then
+    raise exception 'You do not own this theme';
+  end if;
+  update public.profiles set equipped_theme=p_sku where id=v_uid;
+end;
+$$;
+revoke all on function public.equip_krillion_theme(text) from public, anon;
+grant execute on function public.equip_krillion_theme(text) to authenticated;
