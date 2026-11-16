@@ -15,6 +15,19 @@
 .avatar-bg-choice.chosen{border-color:var(--lime);outline:2px solid var(--text)}
 .profile-preview{display:flex;align-items:center;gap:14px;padding:14px;background:var(--panel2);border-radius:14px}
 .profile-preview .avatar{width:76px;height:76px;font-size:36px}
+.avatar{position:relative;border:2px solid transparent}
+.avatar.overlay-neon{border:3px solid #69f7ff;box-shadow:0 0 12px #69f7ff99}
+.avatar.overlay-holo{border:3px solid #d7a5ff;box-shadow:0 0 0 3px #64eaff55,0 0 16px #d7a5ff99}
+.avatar.overlay-pixel{border:4px dotted #b8f36b;border-radius:8px}
+.avatar.overlay-gold{border:3px solid #ffd66b;box-shadow:0 0 12px #ffd66b99}
+.title-card-cosmic{display:inline-block;padding:7px 12px;border-radius:9px;background:linear-gradient(110deg,#21144b,#12506a);border:1px solid #8bdfff}
+.title-card-arcade{display:inline-block;padding:7px 12px;border-radius:5px;background:repeating-linear-gradient(135deg,#2b164f,#2b164f 8px,#4c2368 8px,#4c2368 16px);border:1px solid #e58bff}
+.title-card-matrix{display:inline-block;padding:7px 12px;border-radius:9px;background:linear-gradient(110deg,#062b1c,#0a5a38);border:1px solid #70ff9c}
+.name-effect-glow{text-shadow:0 0 8px #75eaff,0 0 16px #75eaff}
+.name-effect-gradient{background:linear-gradient(90deg,#8cecff,#d6a1ff,#ff9bce);background-clip:text;-webkit-background-clip:text;color:transparent}
+.name-effect-flame{text-shadow:0 0 8px #ff8a45,0 0 14px #ff4c4c}
+.rank-pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:3px 8px;font-size:11px;color:var(--lime);font-weight:800}
+.item-preview{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:var(--panel2);font-size:26px;flex:none}
 @media(max-width:850px){.nav{flex-wrap:nowrap}}
 @media(max-width:850px){.app{grid-template-columns:1fr}.side{position:relative;border-right:0;border-bottom:1px solid var(--line);padding:12px;gap:10px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.profile{max-width:360px}.stats{grid-template-columns:repeat(2,1fr)}.rounds{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.prompts{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}main{padding:18px 13px}}
@@ -34,7 +47,7 @@
  <div class="brand">KRILLION<span>.</span> 3.0</div>
  <div class="profile"><div class="avatar" id="sideAvatar">🦊</div><div><b id="sideName">Player</b><div class="tiny muted"><span id="sideCoins">0</span> coins · <span id="sideLevel">Level 1</span></div></div></div>
  <nav class="nav">
- <button class="active" data-view="home">⌂ &nbsp; Daily games</button><button data-view="history">◷ &nbsp; Game history</button><button data-view="best">✦ &nbsp; Best answers</button><button data-view="players">♧ &nbsp; Players</button><button data-view="shop">▣ &nbsp; Item shop</button><button data-view="themes">◈ &nbsp; Themes</button><button data-view="inventory">◇ &nbsp; Inventory</button><button data-view="profile">☺ &nbsp; Profile</button>
+ <button class="active" data-view="home">⌂ &nbsp; Daily games</button><button data-view="history">◷ &nbsp; Game history</button><button data-view="best">✦ &nbsp; Best answers</button><button data-view="players">♧ &nbsp; Players</button><button data-view="shop">▣ &nbsp; Item shop</button><button data-view="themes">◈ &nbsp; Themes</button><button data-view="inventory">◇ &nbsp; Inventory</button><button data-view="codes">⌁ &nbsp; Codes</button><button data-view="profile">☺ &nbsp; Profile</button>
  </nav><button class="secondary" id="signOut">Sign out</button>
  <div class="tiny muted">One link. Same 10 games. 120 prompts every day.</div>
 </aside>
@@ -51,12 +64,12 @@
  <section class="view" id="best"><h2>Your best answers</h2><p>Your highest-scoring answers across all games.</p><div id="bestList" class="list"></div></section>
  <section class="view" id="players"><h2>Find players</h2><p>Search for people, follow them and check out their profiles.</p><div class="field"><label>Search usernames</label><input id="playerSearch" maxlength="18" placeholder="Search players…"></div><div id="playersList" class="list"></div><div id="publicProfile" class="panel hidden"></div></section>
  <section class="view" id="shop"><h2>Item shop</h2><p>Spend coins earned from rarity points on avatar cosmetics, profile effects and animations.</p><div id="shopList" class="list"></div></section>
- <section class="view" id="themes"><h2>Theme shop</h2><p>Give your whole KRILLION game a new look. Themes are original designs, not official franchise artwork.</p><div id="themeList" class="list"></div></section>
+ <section class="view" id="themes"><h2>Theme shop</h2><p>Give your whole KRILLION game a new look. Themes are original designs, not official franchise artwork.</p><div id="themeList" class="list"></div></section><section class="view" id="codes"><h2>Redeem a code</h2><p>Each code can be redeemed once per player.</p><div class="panel"><div class="field"><label>Secret code</label><input id="redeemInput" maxlength="40" placeholder="Enter code…"></div><button id="redeemButton">Redeem code</button><div class="toast" id="redeemMsg"></div></div></section>
  <section class="view" id="inventory"><h2>Your inventory</h2><p>Items you own. Equip cosmetics to show them on your profile.</p><div id="inventoryList" class="list"></div></section>
  <section class="view" id="profile"><h2>Your profile</h2><div class="panel"><div class="field"><label>Username</label><input id="editUsername" maxlength="18"></div><div class="field"><label>Avatar preset</label><div class="avatars" id="profileAvatars"></div></div>
  <div class="field"><label>Or upload your own image (PNG, JPG, WEBP · max 2 MB)</label><input id="avatarUpload" type="file" accept="image/png,image/jpeg,image/webp"></div>
  <div class="field"><label>Avatar background</label><div class="avatars" id="avatarBackgrounds"></div></div>
- <div class="profile-preview"><div class="avatar" id="profilePreviewAvatar">🦊</div><div><b id="profilePreviewName">Your profile</b><div class="tiny muted">Preview</div></div></div>
+ <div class="profile-preview" id="profilePreviewCard"><div class="avatar" id="profilePreviewAvatar">🦊</div><div><b id="profilePreviewName">Your profile</b><div class="tiny muted" id="profileRank">Newbie</div><div class="tiny muted">Preview</div></div></div>
  <div class="actions"><button id="saveProfile">Save profile</button></div><div class="toast" id="profileMsg"></div></div></section>
 </main></div>
 <script>
@@ -72,17 +85,37 @@ const themes=[
  {sku:"theme_ocean",name:"Deep Ocean",price:350,colors:["#071521","#102a3a","#58d5ff","#8be9fd"],vars:["#071521","#102a3a","#58d5ff","#8be9fd"]},
  {sku:"theme_void",name:"Void Protocol",price:500,colors:["#09090d","#191923","#b7a1ff","#f1e9ff"],vars:["#09090d","#191923","#b7a1ff","#f1e9ff"]},
  {sku:"theme_nebula",name:"Nebula Drift",price:650,colors:["#100b20","#24163a","#d28bff","#7ee7ff"],vars:["#100b20","#24163a","#d28bff","#7ee7ff"]},
- {sku:"theme_cursed",name:"Cursed Pulse",price:650,colors:["#100d13","#211a27","#b9ff66","#e76aff"],vars:["#100d13","#211a27","#b9ff66","#e76aff"]}
+ {sku:"theme_cursed",name:"Cursed Pulse",price:650,colors:["#100d13","#211a27","#b9ff66","#e76aff"],vars:["#100d13","#211a27","#b9ff66","#e76aff"]},
+ {sku:"theme_arcade",name:"8-Bit Arcade",price:550,colors:["#100b25","#25144b","#ff6bd6","#68f7ff"],vars:["#100b25","#25144b","#ff6bd6","#68f7ff"]},
+ {sku:"theme_lab",name:"Mad Scientist",price:600,colors:["#081b16","#12352a","#83ff9b","#c6ff72"],vars:["#081b16","#12352a","#83ff9b","#c6ff72"]},
+ {sku:"theme_codex",name:"Fantasy Codex",price:700,colors:["#1b1110","#342019","#e9b96e","#9ee6c2"],vars:["#1b1110","#342019","#e9b96e","#9ee6c2"]},
+ {sku:"theme_cyber",name:"Cyber Hacker",price:700,colors:["#090d1b","#171c35","#4cf5ff","#f36bff"],vars:["#090d1b","#171c35","#4cf5ff","#f36bff"]},
+ {sku:"theme_mecha",name:"Mecha Core",price:750,colors:["#111820","#253340","#ffb45e","#78d7ff"],vars:["#111820","#253340","#ffb45e","#78d7ff"]}
 ];
 const catalog=[
- {sku:"cap_star",name:"Star Cap",emoji:"🧢",kind:"hat",price:180,desc:"A little star power."},
- {sku:"crown",name:"Tiny Crown",emoji:"👑",kind:"hat",price:450,desc:"For rarity royalty."},
- {sku:"glasses",name:"Pixel Shades",emoji:"🕶️",kind:"accessory",price:250,desc:"Cool in every lobby."},
- {sku:"sparkles",name:"Sparkle Effect",emoji:"✨",kind:"profile effect",price:600,desc:"A bright profile accent."},
- {sku:"flame",name:"Flame Nameplate",emoji:"🔥",kind:"nameplate",price:700,desc:"Stand out on the board."},
- {sku:"dance",name:"Victory Bounce",emoji:"💫",kind:"animation",price:900,desc:"A celebratory profile animation."},
- {sku:"halo",name:"Neon Halo",emoji:"😇",kind:"accessory",price:520,desc:"A glowing little halo."},
- {sku:"orb",name:"Mystery Orb",emoji:"🔮",kind:"profile effect",price:800,desc:"Mysterious energy."}
+ {sku:"cap_star",name:"Star Cap",emoji:"🧢",kind:"hat",slot:"legacy",price:180,desc:"A little star power."},
+ {sku:"crown",name:"Tiny Crown",emoji:"👑",kind:"hat",slot:"legacy",price:450,desc:"For rarity royalty."},
+ {sku:"glasses",name:"Pixel Shades",emoji:"🕶️",kind:"accessory",slot:"legacy",price:250,desc:"Cool in every lobby."},
+ {sku:"sparkles",name:"Sparkle Effect",emoji:"✨",kind:"profile effect",slot:"legacy",price:600,desc:"A bright profile accent."},
+ {sku:"flame",name:"Flame Nameplate",emoji:"🔥",kind:"nameplate",slot:"legacy",price:700,desc:"Stand out on the board."},
+ {sku:"dance",name:"Victory Bounce",emoji:"💫",kind:"animation",slot:"legacy",price:900,desc:"A celebratory profile animation."},
+ {sku:"halo",name:"Neon Halo",emoji:"😇",kind:"accessory",slot:"legacy",price:520,desc:"A glowing little halo."},
+ {sku:"orb",name:"Mystery Orb",emoji:"🔮",kind:"profile effect",slot:"legacy",price:800,desc:"Mysterious energy."},
+ {sku:"overlay_neon",name:"Neon PFP Frame",emoji:"💠",kind:"PFP overlay",slot:"overlay",price:450,desc:"A bright cyan avatar frame."},
+ {sku:"overlay_holo",name:"Holographic PFP Frame",emoji:"🌈",kind:"PFP overlay",slot:"overlay",price:700,desc:"A holographic profile border."},
+ {sku:"overlay_pixel",name:"Pixel PFP Frame",emoji:"🟩",kind:"PFP overlay",slot:"overlay",price:350,desc:"Retro dotted pixel border."},
+ {sku:"overlay_gold",name:"Gold PFP Frame",emoji:"🏅",kind:"PFP overlay",slot:"overlay",price:850,desc:"A premium gold avatar frame."},
+ {sku:"card_cosmic",name:"Cosmic Title Card",emoji:"🌌",kind:"title card",slot:"title",price:650,desc:"A cosmic banner behind your name."},
+ {sku:"card_arcade",name:"Arcade Title Card",emoji:"🕹️",kind:"title card",slot:"title",price:550,desc:"Retro arcade energy."},
+ {sku:"card_matrix",name:"Matrix Title Card",emoji:"💻",kind:"title card",slot:"title",price:700,desc:"A digital green-code banner."},
+ {sku:"name_glow",name:"Electric Name Glow",emoji:"⚡",kind:"name effect",slot:"name",price:500,desc:"Make your username glow."},
+ {sku:"name_gradient",name:"Galaxy Name Gradient",emoji:"🪐",kind:"name effect",slot:"name",price:750,desc:"A galaxy-colour look."},
+ {sku:"name_flame",name:"Flame Name Effect",emoji:"🔥",kind:"name effect",slot:"name",price:800,desc:"A fiery username glow."},
+ {sku:"bg_stars",name:"Starfield Profile",emoji:"✨",kind:"profile background",slot:"background",price:600,desc:"A starry profile backdrop."},
+ {sku:"bg_grid",name:"Cyber Grid Profile",emoji:"🔷",kind:"profile background",slot:"background",price:600,desc:"A subtle digital grid."},
+ {sku:"badge_nerd",name:"Certified Nerd",emoji:"🤓",kind:"profile badge",slot:"badge",price:300,desc:"Show off your nerd credentials."},
+ {sku:"badge_founder",name:"OG Player",emoji:"🏆",kind:"profile badge",slot:"badge",price:900,desc:"A special profile badge."},
+ {sku:"badge_arcade",name:"Arcade Legend",emoji:"👾",kind:"profile badge",slot:"badge",price:500,desc:"For arcade enjoyers."}
 ];
 const banks=[
 ["A red sauce","A 90s movie","A song released in 2025–2026","A video game with 10k+ active players","A cereal brand","A cartoon character","A famous landmark","A pizza topping","A superhero","A board game","A country with a coastline","A thing found in a school bag"],
