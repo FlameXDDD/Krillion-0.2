@@ -1,42 +1,35 @@
 KRILLION 3.0 — INSTALLATION
 
-WHAT'S INCLUDED
-- index.html: KRILLION 3.0 game interface
-- migration_v2.sql: original 2.0 database setup (only if starting fresh)
-- migration_v3.sql: additive 3.0 upgrade for an existing 2.0 project
+FILES
+- index.html: game interface
+- migration_v2.sql: original KRILLION 2.0 database setup (already installed on the existing project)
+- migration_v3.sql: additive KRILLION 3.0 database upgrade
 - README.txt: these instructions
 
-UPGRADE AN EXISTING KRILLION 2.0 PROJECT
-1. Open your Supabase project → SQL Editor.
-2. Open migration_v3.sql from this repository.
-3. Copy the entire file into a new SQL query and run it ONCE.
-4. Do NOT delete your existing tables or run migration_v2.sql again.
-5. The upgrade adds profile customisation, follows, theme purchases and the updated scoring function. Existing accounts, answers, points, coins and inventory are kept.
+UPGRADING AN EXISTING KRILLION 2.0 PROJECT
+1. Keep the existing Supabase project and its data.
+2. Run migration_v3.sql ONCE in the Supabase SQL Editor, after migration_v2.sql.
+3. Do not delete or recreate profiles, answers, inventory, or auth users.
+4. Publish the updated index.html from the krillion-3.0 branch after reviewing and merging the pull request.
 
-AVATAR UPLOADS
-The migration creates a public "avatars" Storage bucket. Uploaded images are limited to PNG, JPG or WEBP and 2 MB. Signed-in users can upload only into their own user-ID folder. Images are public so they can appear on player profiles.
+CONFIGURATION
+The index.html file contains the project's Supabase URL and public publishable key. A publishable key is intended for browser use; never put a Supabase secret/service-role key in frontend code.
+In Supabase Dashboard → Authentication → URL Configuration, set the Site URL and Redirect URLs to the hosted website address.
 
-PUBLISH THE WEBSITE
-1. Replace the index.html file in your GitHub repository with the new version from this KRILLION 3.0 branch.
-2. Merge the KRILLION 3.0 pull request into main when you're ready.
-3. GitHub Pages should publish the updated site automatically. Keep the same website URL.
+KRILLION 3.0 FEATURES
+- 10 daily games with 12 prompts each.
+- Player search, follow/unfollow, and public player profiles.
+- Preset emoji avatars or uploaded PNG/JPG/WEBP avatars (maximum 2 MB), plus avatar background colours.
+- Original game themes: Midnight Lime, Crimson Rush, Deep Ocean, Void Protocol, Nebula Drift, and Cursed Pulse.
+- Existing profiles, answers, points, coins and inventory are preserved by the additive migration.
 
 SCORING
-- 70% niche-specificity estimate + 30% player rarity.
-- The niche score is a transparent text-specificity estimate using descriptive words, distinct words and answer detail. It is NOT live internet search or a measured web popularity score.
-- Player rarity starts at 100 and drops by 8 for each matching earlier player answer, to a floor of 40.
-- Combined score is rounded to the nearest whole point.
-- Scores are snapshots when submitted; later answers do not recalculate earlier scores.
+- Combined score: 70% niche-specificity estimate + 30% player rarity.
+- Player rarity starts at 100 and drops by 8 for each earlier matching answer, to a minimum of 40.
+- The niche-specificity estimate looks at descriptive and distinctive wording. It is NOT a live internet search or a measured web-popularity score.
+- Scores are saved when an answer is submitted; earlier scores are not recalculated when later players submit matching answers.
 
-NEW FEATURES
-- Follow and unfollow other players; search usernames and view public profiles.
-- Use preset emoji avatars or upload your own image.
-- Choose an avatar background colour.
-- Buy and equip original colour themes: Crimson Rush, Deep Ocean, Void Protocol, Nebula Drift and Cursed Pulse.
-- Themes are original designs inspired by broad space/anime colour moods, not official franchise art or branding.
-
-IMPORTANT
-- Run migration_v3.sql only once, after your existing 2.0 setup.
-- Keep the Supabase publishable/anon key in the frontend; never put a service-role/secret key in index.html.
-- Supabase Auth Site URL and Redirect URLs should continue to use your GitHub Pages URL.
-- The first public release is still a prototype. Add stronger anti-cheat, moderation and server-side prompt validation before treating scores as high-stakes competition.
+PROTOTYPE LIMITATIONS
+- The prompt bank and answer submission interface run in the browser. This is a prototype, not a hardened competitive platform.
+- Do not enter personal or sensitive information as answers.
+- Before a large public launch, add server-side prompt validation, rate limits, moderation and stronger anti-cheat protections.
