@@ -69,6 +69,7 @@ for each row execute procedure public.krillion_new_profile();
 
 -- Heuristic estimate of broad internet/commonness (not a live web popularity lookup).
 -- Score combines 70% player uniqueness and 30% niche wording estimate.
+
 create or replace function public.submit_krillion_answer(
  p_game_day date, p_game_no integer, p_prompt_no integer, p_prompt text, p_answer text
 ) returns table(player_points integer,internet_points integer,total_points integer)
@@ -87,21 +88,28 @@ begin
  if v_uid is null then raise exception 'Sign in required'; end if;
  if p_game_no not between 1 and 10 or p_prompt_no not between 1 and 12 then raise exception 'Invalid game or prompt'; end if;
  if length(trim(p_answer)) < 1 or length(p_answer)>100 then raise exception 'Answer must be 1–100 characters'; end if;
+
  select count(*) into v_count from public.answers
  where game_day=p_game_day and game_no=p_game_no and prompt_no=p_prompt_no
  and lower(regexp_replace(trim(answer),'\s+',' ','g'))=v_norm and user_id<>v_uid;
- -- Repeated answers get fewer points. First matching player receives 100.
+
  v_player := greatest(5,100-(v_count*15));
  v_words := array_length(regexp_split_to_array(trim(p_answer),'\s+'),1);
  v_chars := length(trim(p_answer));
- -- Transparent estimate only: longer, more specific answer strings get a small niche bonus.
  v_internet := least(100,greatest(10,25 + least(v_chars,45) + greatest(0,v_words-1)*8));
  v_total := round(v_player*0.7 + v_internet*0.3);
+
  insert into public.answers(user_id,game_day,game_no,prompt_no,prompt,answer,player_points,internet_points,total_points)
  values(v_uid,p_game_day,p_game_no,p_prompt_no,p_prompt,trim(p_answer),v_player,v_internet,v_total);
- update public.profiles set coins=coins+v_total,total_points=total_points+v_total where id=v_uid;
+
+ update public.profiles as prof
+ set coins = prof.coins + v_total,
+     total_points = prof.total_points + v_total
+ where prof.id = v_uid;
+
  return query select v_player,v_internet,v_total;
-end; $$;
+end;
+$$;
 
 create or replace function public.buy_krillion_item(
  p_sku text,p_name text,p_emoji text,p_price integer,p_kind text
