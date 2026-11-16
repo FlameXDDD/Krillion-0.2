@@ -3,10 +3,10 @@
 ## Supabase
 
 1. Open the project's Supabase SQL Editor.
-2. Open `migration_v4.sql` from this repository and run the complete file once. It is additive and preserves existing profiles, answers, coins, points, follows, inventory and themes.
+2. Open `migration_v3_1.sql` from this repository and run the complete file once. It is additive and preserves existing profiles, answers, coins, points, follows, inventory and themes.
 3. Add your private redeem codes directly in the Supabase SQL Editor. Do not put real codes in this public GitHub repository.
 
-Example for adding a private 1,000-coin code:
+Example for adding a private 1,000-coin code (replace the placeholder with your code in the Supabase SQL Editor):
 
 ```sql
 insert into public.krillion_redeem_codes(code, coin_reward, active)
@@ -19,7 +19,7 @@ The code table has no client read/write permissions. Players redeem through the 
 
 ## KRILLION 3.1 changes
 
-- One-time-per-player redeem codes.
+- One-time-per-player redeem codes. Add your private codes directly in Supabase; this public migration deliberately contains no live code.
 - Expanded original theme collection.
 - Shop items for PFP overlays, title cards, name effects, profile backgrounds and badges.
 - Server-side item catalogue and fixed purchase prices.
