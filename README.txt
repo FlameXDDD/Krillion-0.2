@@ -18,6 +18,12 @@ The index.html file contains the project's Supabase URL and public publishable k
 In Supabase Dashboard → Authentication → URL Configuration, set the Site URL and Redirect URLs to the hosted website address.
 
 KRILLION 3.0 FEATURES (existing release)
+
+KRILLION 3.1 DRAFT FEATURES
+- One-time-per-player promo code redemption (LilBOOM awards 1,000 coins).
+- Expanded item shop: avatar frames, title cards, name effects, profile backgrounds and badges.
+- New original themes: 8-Bit Arcade, Mad Scientist, Fantasy Codex, Cyber Hacker and Mecha Core.
+- Player rank labels: Newbie, Rookie, Regular, Grinder, Veteran, Elite and Top Board (global top 10).
 - 10 daily games with 12 prompts each.
 - Player search, follow/unfollow, and public player profiles.
 - Preset emoji avatars or uploaded PNG/JPG/WEBP avatars (maximum 2 MB), plus avatar background colours.
