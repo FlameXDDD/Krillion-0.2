@@ -20,7 +20,7 @@ In Supabase Dashboard → Authentication → URL Configuration, set the Site URL
 KRILLION 3.0 FEATURES (existing release)
 
 KRILLION 3.1 DRAFT FEATURES
-- One-time-per-player promo code redemption (LilBOOM awards 1,000 coins).
+- One-time-per-player promo code redemption (private codes are added in Supabase, not stored in this public repository).
 - Expanded item shop: avatar frames, title cards, name effects, profile backgrounds and badges.
 - New original themes: 8-Bit Arcade, Mad Scientist, Fantasy Codex, Cyber Hacker and Mecha Core.
 - Player rank labels: Newbie, Rookie, Regular, Grinder, Veteran, Elite and Top Board (global top 10).
