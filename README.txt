@@ -1,40 +1,35 @@
-KRILLION 2.0 — INSTALLATION
+KRILLION 3.0 — INSTALLATION
 
 FILES
-- index.html: new game interface
-- migration_v2.sql: database migration
+- index.html: game interface
+- migration_v2.sql: original KRILLION 2.0 database setup (already installed on the existing project)
+- migration_v3.sql: additive KRILLION 3.0 database upgrade
 - README.txt: these instructions
 
-IMPORTANT FIRST
-This is an upgrade to your existing Supabase project. Run migration_v2.sql ONCE in the SQL Editor. It creates profiles, answer history, inventory, account setup trigger, scoring and shop purchase functions. Do not delete your old tables.
+UPGRADING AN EXISTING KRILLION 2.0 PROJECT
+1. Keep the existing Supabase project and its data.
+2. Run migration_v3.sql ONCE in the Supabase SQL Editor, after migration_v2.sql.
+3. Do not delete or recreate profiles, answers, inventory, or auth users.
+4. Publish the updated index.html from the krillion-3.0 branch after reviewing and merging the pull request.
 
-CONFIGURE THE WEBSITE
-1. Open index.html in Notepad or a code editor.
-2. Near the top of the script, replace:
-   https://YOUR_PROJECT_ID.supabase.co
-   with your Supabase Project URL (not the dashboard URL).
-3. Replace YOUR_SUPABASE_PUBLISHABLE_KEY with your sb_publishable_... key.
-4. Save index.html.
-5. Host the folder on a static hosting service (GitHub Pages, Netlify, Cloudflare Pages) and share that hosted URL.
+CONFIGURATION
+The index.html file contains the project's Supabase URL and public publishable key. A publishable key is intended for browser use; never put a Supabase secret/service-role key in frontend code.
+In Supabase Dashboard → Authentication → URL Configuration, set the Site URL and Redirect URLs to the hosted website address.
 
-SUPABASE AUTH
-In Supabase Dashboard → Authentication → URL Configuration:
-- Set Site URL to your hosted website URL.
-- Add that same URL to Redirect URLs.
-For a quick test opened locally, email confirmation may require a hosted URL. Do not disable security settings casually.
+KRILLION 3.0 FEATURES
+- 10 daily games with 12 prompts each.
+- Player search, follow/unfollow, and public player profiles.
+- Preset emoji avatars or uploaded PNG/JPG/WEBP avatars (maximum 2 MB), plus avatar background colours.
+- Original game themes: Midnight Lime, Crimson Rush, Deep Ocean, Void Protocol, Nebula Drift, and Cursed Pulse.
+- Existing profiles, answers, points, coins and inventory are preserved by the additive migration.
 
-GAME DESIGN NOTES
-- 10 games/day, 12 prompts each (120 total).
-- Everyone gets the same daily prompt sets. The current front-end rotates through a built-in 10x12 prompt bank deterministically by UTC date.
-- Player rarity: first matching answer receives a higher score; duplicate answers lose 15 player-rarity points per earlier matching player, down to a minimum.
-- “Internet rarity” is currently a transparent text-specificity estimate based on answer length and word count. It is NOT live internet search or a measured web popularity score. To make that genuine, connect a curated dataset or server-side popularity/search provider.
-- Combined score = 70% player rarity + 30% estimated internet rarity.
-- Coins are earned from points and spent on shop cosmetics.
-- Usernames, avatars, game answers, scores and purchased items persist in Supabase.
+SCORING
+- Combined score: 70% niche-specificity estimate + 30% player rarity.
+- Player rarity starts at 100 and drops by 8 for each earlier matching answer, to a minimum of 40.
+- The niche-specificity estimate looks at descriptive and distinctive wording. It is NOT a live internet search or a measured web-popularity score.
+- Scores are saved when an answer is submitted; earlier scores are not recalculated when later players submit matching answers.
 
-PROTOTYPE LIMITATIONS / SECURITY
-- This is a working starter, not a production-hardened competitive platform.
-- The SQL RPC enforces authentication and server-side scoring, but the prompt bank is client-side and the browser can be modified. Add server-side prompt validation, rate limits, anti-cheat checks and moderation before public launch.
-- Supabase email confirmation should be configured. Usernames are unique.
-- The first matching answer gets more points based on current submissions. Scores are snapshots at submission time; later matching answers do not automatically recalculate earlier players' scores.
-- All authenticated users can read answers for shared rarity. Avoid storing personal information in answers.
+PROTOTYPE LIMITATIONS
+- The prompt bank and answer submission interface run in the browser. This is a prototype, not a hardened competitive platform.
+- Do not enter personal or sensitive information as answers.
+- Before a large public launch, add server-side prompt validation, rate limits, moderation and stronger anti-cheat protections.
