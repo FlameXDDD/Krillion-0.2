@@ -139,7 +139,7 @@ $("submitRound").onclick=async()=>{
  if(!payload.length){say("gameMsg","Add answers first, or this game has already been submitted.");return}
  try{for(let p of payload){let {error}=await db.rpc("submit_krillion_answer",p);if(error)throw error}
  say("gameMsg","Game submitted! Your points and rarity breakdown are saved.");await loadToday();await loadLeaderboard();drawPrompts()}
- catch(e){say("gameMsg","Submit error: "+e.message)}
+ catch(e){say("gameMsg","Submit error: "+e.message+". Refreshing saved answers…");try{await loadToday()}catch(refreshError){say("gameMsg","Submit error: "+e.message+". Reload the page before retrying.")}}
 };
 async function loadLeaderboard(){let {data,error}=await db.from("daily_leaderboard").select("*").eq("game_day",day).limit(20);if(error){$("leaderboard").textContent=error.message;return}
  $("leaderboard").innerHTML=data.length?`<table><tr><th>Rank</th><th>Player</th><th>Points</th></tr>${data.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.username)}</td><td>${r.points}</td></tr>`).join("")}</table>`:"No scores yet today."}
