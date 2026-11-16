@@ -1,9 +1,10 @@
-KRILLION 3.0 — INSTALLATION
+KRILLION 3.1 — INSTALLATION (DRAFT)
 
 FILES
 - index.html: game interface
 - migration_v2.sql: original KRILLION 2.0 database setup (already installed on the existing project)
 - migration_v3.sql: additive KRILLION 3.0 database upgrade
+- migration_v3_1.sql: additive KRILLION 3.1 database upgrade (run only when the 3.1 frontend is ready)
 - README.txt: these instructions
 
 UPGRADING AN EXISTING KRILLION 2.0 PROJECT
@@ -16,7 +17,7 @@ CONFIGURATION
 The index.html file contains the project's Supabase URL and public publishable key. A publishable key is intended for browser use; never put a Supabase secret/service-role key in frontend code.
 In Supabase Dashboard → Authentication → URL Configuration, set the Site URL and Redirect URLs to the hosted website address.
 
-KRILLION 3.0 FEATURES
+KRILLION 3.0 FEATURES (existing release)
 - 10 daily games with 12 prompts each.
 - Player search, follow/unfollow, and public player profiles.
 - Preset emoji avatars or uploaded PNG/JPG/WEBP avatars (maximum 2 MB), plus avatar background colours.
