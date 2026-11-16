@@ -100,7 +100,7 @@ const day=new Date().toISOString().slice(0,10), dayIndex=Math.floor(new Date(day
 let user=null,profile=null,round=0,answers={},submitted={},profileAvatarUrl=null,profileAvatarBg=avatarBackgrounds[0];
 const $=id=>document.getElementById(id);
 function say(id,msg){$(id).textContent=msg}
-function promptsForRound(n){return banks[(dayIndex*10+n)%banks.length]}
+function promptsForRound(n){return banks[(dayIndex+n)%banks.length]}
 function promptStable(n){return promptsForRound(n)}
 function avatarButtons(target,chosen,cb){$(target).innerHTML="";avatars.forEach(a=>{let b=document.createElement("button");b.className="avatarpick"+(a===chosen?" chosen":"");b.textContent=a;b.onclick=()=>cb(a);$(target).appendChild(b)})}
 let chosenAvatar=avatars[0],signupMode=true;
