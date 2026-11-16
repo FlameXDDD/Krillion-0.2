@@ -5,6 +5,7 @@
 1. Open the project's Supabase SQL Editor.
 2. Open `migration_v3_1.sql` from this repository and run the complete file once. It is additive and preserves existing profiles, answers, coins, points, follows, inventory and themes.
 3. Add your private redeem codes directly in the Supabase SQL Editor. Do not put real codes in this public GitHub repository.
+4. Once the migration is applied, merge PR #2 into `main`. GitHub Pages should then publish the updated `index.html` from `main`; wait for deployment before testing the new features.
 
 Example for adding a private 1,000-coin code (replace the placeholder with your code in the Supabase SQL Editor):
 
