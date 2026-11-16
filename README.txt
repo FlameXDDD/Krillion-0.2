@@ -1,4 +1,4 @@
-KRILLION 3.1 — INSTALLATION (DRAFT)
+KRILLION 3.1 — INSTALLATION
 
 FILES
 - index.html: game interface
@@ -11,7 +11,8 @@ UPGRADING AN EXISTING KRILLION 2.0 PROJECT
 1. Keep the existing Supabase project and its data.
 2. Run migration_v3.sql ONCE in the Supabase SQL Editor, after migration_v2.sql.
 3. Do not delete or recreate profiles, answers, inventory, or auth users.
-4. Publish the updated index.html from the krillion-3.0 branch after reviewing and merging the pull request.
+4. For the existing KRILLION 3.0 project, run `migration_v3_1.sql` once after the KRILLION 3.1 pull request is ready to deploy. Do not rerun `migration_v2.sql` or `migration_v3.sql` if they have already been applied.
+5. After the pull request is merged into `main`, GitHub Pages publishes the updated `index.html` from `main`.
 
 CONFIGURATION
 The index.html file contains the project's Supabase URL and public publishable key. A publishable key is intended for browser use; never put a Supabase secret/service-role key in frontend code.
