@@ -30,7 +30,7 @@ revoke all on public.krillion_code_redemptions from anon, authenticated;
 -- Add private promo codes manually in Supabase SQL Editor; never commit real codes here.
 
 create or replace function public.redeem_krillion_code(p_code text)
-returns integer language plpgsql security definer set search_path=public
+returns integer language plpgsql security definer set search_path = ''
 as $$
 declare
   v_uid uuid := auth.uid();
@@ -58,7 +58,7 @@ grant execute on function public.redeem_krillion_code(text) to authenticated;
 -- Purchase prices and item metadata are fixed on the server; clients cannot choose their price.
 drop function if exists public.buy_krillion_item(text,text,text,integer,text);
 create or replace function public.buy_krillion_item(p_sku text)
-returns void language plpgsql security definer set search_path=public
+returns void language plpgsql security definer set search_path = ''
 as $$
 declare
   v_uid uuid := auth.uid();
@@ -108,7 +108,7 @@ revoke all on function public.buy_krillion_item(text) from public, anon;
 grant execute on function public.buy_krillion_item(text) to authenticated;
 
 create or replace function public.equip_krillion_item(p_sku text)
-returns void language plpgsql security definer set search_path=public
+returns void language plpgsql security definer set search_path = ''
 as $$
 declare
   v_uid uuid := auth.uid();
@@ -133,7 +133,7 @@ grant execute on function public.equip_krillion_item(text) to authenticated;
 
 -- Expand the original-theme catalogue with original nerd-culture aesthetics.
 create or replace function public.buy_krillion_theme(p_sku text)
-returns void language plpgsql security definer set search_path=public
+returns void language plpgsql security definer set search_path = ''
 as $$
 declare
   v_uid uuid := auth.uid();
@@ -172,7 +172,7 @@ grant select on public.profiles to authenticated;
 -- The free default theme is always available.
 revoke update (equipped_theme) on public.profiles from authenticated;
 create or replace function public.equip_krillion_theme(p_sku text)
-returns void language plpgsql security definer set search_path=public
+returns void language plpgsql security definer set search_path = ''
 as $$
 declare
   v_uid uuid := auth.uid();
