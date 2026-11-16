@@ -22,9 +22,8 @@ alter table public.krillion_redeem_codes enable row level security;
 alter table public.krillion_code_redemptions enable row level security;
 revoke all on public.krillion_redeem_codes from anon,authenticated;
 revoke all on public.krillion_code_redemptions from anon,authenticated;
-insert into public.krillion_redeem_codes(code,coin_reward,active)
-values('LilBOOM',1000,true)
-on conflict(code) do update set coin_reward=excluded.coin_reward,active=true;
+-- Add secret codes directly in Supabase SQL Editor after this migration.
+-- Do not commit real redeem codes to this public repository.
 
 create or replace function public.redeem_krillion_code(p_code text)
 returns integer language plpgsql security definer set search_path=public as $$
