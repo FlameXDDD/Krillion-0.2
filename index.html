@@ -163,8 +163,10 @@ async function boot(){
 }
 async function loadToday(){
  let {data,error}=await db.from("answers").select("*").eq("user_id",user.id).eq("game_day",day).order("game_no").order("prompt_no");if(error)throw error;
- submitted={};answers={};data.forEach(r=>{submitted[r.game_no]=true;answers[r.game_no+"_"+r.prompt_no]=r});
+ submitted={};answers={};data.forEach(r=>{answers[r.game_no+"_"+r.prompt_no]=r});
+ for(let g=1;g<=10;g++)submitted[g]=data.filter(r=>Number(r.game_no)===g).length===12;
  let total=data.length,pts=data.reduce((s,r)=>s+r.total_points,0);$("todayDone").textContent=total+"/120";$("todayPoints").textContent=pts;$("todayPoints").dataset.points=pts;
+ promptIndex=promptStable(round).findIndex((_,j)=>!answers[(round+1)+"_"+(j+1)]);if(promptIndex<0)promptIndex=12;
  drawRounds();drawPrompts();
 }
 function drawRounds(){let root=$("rounds");root.innerHTML="";for(let i=1;i<=10;i++){let b=document.createElement("button");b.className="round"+(round===i-1?" selected":"");b.innerHTML=`<b>GAME ${String(i).padStart(2,"0")}</b><small>${submitted[i]?"✓ Submitted":"12 prompts"}</small>`;b.onclick=()=>{round=i-1;promptIndex=promptStable(round).findIndex((_,j)=>!answers[(round+1)+"_"+(j+1)]);if(promptIndex<0)promptIndex=12;drawRounds();drawPrompts()};root.appendChild(b)}}
