@@ -55,12 +55,12 @@
  <div class="tiny muted">One link. Same 10 games. 120 prompts every day.</div>
 </aside>
 <main>
- <div class="top"><div><div class="eyebrow">KRILLION DAILY CHALLENGE</div><h1 id="pageTitle">Think niche. Score big.</h1><div class="muted" id="dateLabel"></div></div><span class="pill" id="connection">Connecting…</span></div>
+ <div class="top"><div><div class="eyebrow">KRILLION DAILY CHALLENGE</div><h1 id="pageTitle">Think niche. Score big.</h1><div class="muted" id="dateLabel"></div><div class="tiny muted" id="dailyCountdown">Next daily set in --:--:-- UTC</div></div><span class="pill" id="connection">Connecting…</span></div>
  <section class="view active" id="home">
   <div class="stats"><div class="stat"><b id="todayPoints">0</b><span>Today's points</span></div><div class="stat"><b id="todayDone">0/120</b><span>Answers submitted</span></div><div class="stat"><b id="coinCount">0</b><span>Shop coins</span></div><div class="stat"><b id="streak">—</b><span>Daily streak</span></div></div>
   <div class="panel"><div class="top"><div><h2>Today's 10 games</h2><p class="tiny">Everyone gets the same 120 prompts. Each game has 12 unique categories.</p></div><span class="pill" id="dayId"></span></div><div class="rounds" id="rounds"></div></div>
   <div class="top"><h2 id="roundTitle">Game 1 · 12 prompts</h2><span class="pill" id="roundProgress">0/12 submitted</span></div>
-  <div class="prompts" id="prompts"></div><div class="actions"><button id="submitRound">Submit this game</button><button class="secondary" id="refreshBoard">Refresh leaderboard</button></div><div class="toast" id="gameMsg"></div>
+  <div class="prompts" id="prompts"></div><div class="actions"><button class="secondary" id="refreshBoard">Refresh leaderboard</button></div><div class="toast" id="gameMsg"></div>
   <div class="panel"><h2>Today's leaderboard</h2><div id="leaderboard" class="muted tiny">Loading…</div></div>
  </section>
  <section class="view" id="history"><h2>Previous games</h2><p>Your submitted answers and scores from earlier days.</p><div id="historyList" class="list"></div></section>
@@ -132,11 +132,14 @@ const banks=[
 ["A type of tea","A sci-fi movie","A song released in the 1990s","A platform game","A biscuit brand","A folklore creature","A volcano","A curry dish","A famous detective","An African country","A note-taking app","A shoe brand"],
 ["A fermented food","A sports movie","A song with a place in its title","A city-building game","A fruit drink","An insect","A bridge","A type of pastry","A movie sidekick","An Asian capital","A music app","A kitchen utensil"]
 ];
-const day=new Date().toISOString().slice(0,10), dayIndex=Math.floor(new Date(day+"T00:00:00Z").getTime()/86400000);
-let user=null,profile=null,round=0,answers={},submitted={},profileAvatarUrl=null,profileAvatarBg=avatarBackgrounds[0];
+let day=new Date().toISOString().slice(0,10), dayIndex=Math.floor(new Date(day+"T00:00:00Z").getTime()/86400000);
+let dailyPrompts=[];
+function buildDailyPrompts(){const all=banks.flat(),seedText=day;let seed=0;for(let i=0;i<seedText.length;i++)seed=(seed*31+seedText.charCodeAt(i))>>>0;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};const items=[...all];for(let i=items.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[items[i],items[j]]=[items[j],items[i]]}dailyPrompts=items;}
+buildDailyPrompts();
+let user=null,profile=null,round=0,promptIndex=0,answers={},submitted={},profileAvatarUrl=null,profileAvatarBg=avatarBackgrounds[0];
 const $=id=>document.getElementById(id);
 function say(id,msg){$(id).textContent=msg}
-function promptsForRound(n){return banks[(dayIndex+n)%banks.length]}
+function promptsForRound(n){return dailyPrompts.slice(n*12,(n+1)*12)}
 function promptStable(n){return promptsForRound(n)}
 function avatarButtons(target,chosen,cb){$(target).innerHTML="";avatars.forEach(a=>{let b=document.createElement("button");b.className="avatarpick"+(a===chosen?" chosen":"");b.textContent=a;b.onclick=()=>cb(a);$(target).appendChild(b)})}
 let chosenAvatar=avatars[0],signupMode=true;
@@ -164,19 +167,36 @@ async function loadToday(){
  let total=data.length,pts=data.reduce((s,r)=>s+r.total_points,0);$("todayDone").textContent=total+"/120";$("todayPoints").textContent=pts;$("todayPoints").dataset.points=pts;
  drawRounds();drawPrompts();
 }
-function drawRounds(){let root=$("rounds");root.innerHTML="";for(let i=1;i<=10;i++){let b=document.createElement("button");b.className="round"+(round===i-1?" selected":"");b.innerHTML=`<b>GAME ${String(i).padStart(2,"0")}</b><small>${submitted[i]?"✓ Submitted":"12 prompts"}</small>`;b.onclick=()=>{round=i-1;drawRounds();drawPrompts()};root.appendChild(b)}}
-function drawPrompts(){let root=$("prompts");root.innerHTML="";let arr=promptStable(round);$("roundTitle").textContent=`Game ${round+1} · 12 prompts`;$("roundProgress").textContent=arr.filter((_,i)=>answers[(round+1)+"_"+(i+1)]).length+"/12 saved";
- arr.forEach((p,i)=>{let key=(round+1)+"_"+(i+1),old=answers[key],card=document.createElement("article");card.className="prompt";card.innerHTML=`<div class="meta"><span>${String(i+1).padStart(2,"0")} / 12</span><span class="pill">${old?"SUBMITTED":"DAILY PROMPT"}</span></div><h3></h3><input maxlength="100" placeholder="Your niche answer…" ${old?"disabled":""}><div class="answer-score">${old?`+${old.total_points} pts · Player ${old.player_points} / Niche ${old.internet_points}`:"Niche answers earn more."}</div>`;
- card.querySelector("h3").textContent=p;let input=card.querySelector("input");input.value=old?old.answer:"";input.onchange=()=>{answers[key]={answer:input.value.trim()};$("roundProgress").textContent=arr.filter((_,j)=>j===i?input.value.trim():answers[(round+1)+"_"+(j+1)]).length+"/12 saved"};root.appendChild(card)})
+function drawRounds(){let root=$("rounds");root.innerHTML="";for(let i=1;i<=10;i++){let b=document.createElement("button");b.className="round"+(round===i-1?" selected":"");b.innerHTML=`<b>GAME ${String(i).padStart(2,"0")}</b><small>${submitted[i]?"✓ Submitted":"12 prompts"}</small>`;b.onclick=()=>{round=i-1;promptIndex=promptStable(round).findIndex((_,j)=>!answers[(round+1)+"_"+(j+1)]);if(promptIndex<0)promptIndex=12;drawRounds();drawPrompts()};root.appendChild(b)}}
+function drawPrompts(){
+ let root=$("prompts");root.innerHTML="";let arr=promptStable(round);
+ let saved=arr.filter((_,i)=>answers[(round+1)+"_"+(i+1)]).length;
+ $("roundTitle").textContent=`Game ${round+1} · 12 prompts`;
+ $("roundProgress").textContent=saved+"/12 saved";
+ if(promptIndex>=12||saved===12){root.innerHTML='<article class="prompt"><h3>Game complete!</h3><p>All 12 answers have been saved.</p></article>';return}
+ let i=promptIndex,p=arr[i],key=(round+1)+"_"+(i+1),old=answers[key],card=document.createElement("article");
+ card.className="prompt";
+ card.innerHTML=`<div class="meta"><span>QUESTION ${String(i+1).padStart(2,"0")} / 12</span><span class="pill">${old?"SUBMITTED":"DAILY PROMPT"}</span></div><h3></h3><input maxlength="100" placeholder="Your niche answer…" ${old?"disabled":""}><div class="answer-score">${old?`+${old.total_points} pts · Player ${old.player_points} / Niche ${old.internet_points}`:"Submit this answer to reveal the next question."}</div>`;
+ card.querySelector("h3").textContent=p;
+ let input=card.querySelector("input");input.value=old?old.answer:"";
+ let submit=document.createElement("button");submit.textContent=old?"Already submitted":"Submit answer";submit.disabled=!!old;
+ submit.onclick=async()=>{
+  if(!user)return;
+  let answer=input.value.trim();if(!answer){say("gameMsg","Enter an answer before continuing.");input.focus();return}
+  submit.disabled=true;say("gameMsg","Saving answer…");
+  try{
+   let {error}=await db.rpc("submit_krillion_answer",{p_game_day:day,p_game_no:round+1,p_prompt_no:i+1,p_prompt:p,p_answer:answer});
+   if(error)throw error;
+   await loadToday();await loadRankings();await loadLeaderboard();
+   let next=arr.findIndex((_,j)=>j>i&&!answers[(round+1)+"_"+(j+1)]);
+   if(next<0)next=arr.findIndex((_,j)=>!answers[(round+1)+"_"+(j+1)]);
+   promptIndex=next<0?12:next;
+   say("gameMsg",promptIndex>=12?"Game complete! All answers saved.":"Answer saved! Next question unlocked.");
+   drawPrompts();
+  }catch(e){say("gameMsg","Could not save answer: "+e.message);submit.disabled=false}
+ };
+ card.appendChild(submit);root.appendChild(card);
 }
-$("submitRound").onclick=async()=>{
- if(!user)return;say("gameMsg","Submitting answers…");let arr=promptStable(round),payload=[];
- for(let i=0;i<12;i++){let k=(round+1)+"_"+(i+1),v=answers[k];let answer=typeof v==="string"?v:v?.answer;if(answer?.trim()&&!answers[k]?.id)payload.push({p_game_day:day,p_game_no:round+1,p_prompt_no:i+1,p_prompt:arr[i],p_answer:answer.trim()})}
- if(!payload.length){say("gameMsg","Add answers first, or this game has already been submitted.");return}
- try{for(let p of payload){let {error}=await db.rpc("submit_krillion_answer",p);if(error)throw error}
- say("gameMsg","Game submitted! Your points and rarity breakdown are saved.");await loadToday();await loadRankings();await loadLeaderboard();drawPrompts()}
- catch(e){say("gameMsg","Submit error: "+e.message+". Refreshing saved answers…");try{await loadToday()}catch(refreshError){say("gameMsg","Submit error: "+e.message+". Reload the page before retrying.")}}
-};
 let leaderboardLoading=false;
 async function loadLeaderboard(){if(leaderboardLoading)return;leaderboardLoading=true;try{let {data,error}=await db.from("daily_leaderboard").select("*").eq("game_day",day).order("points",{ascending:false}).order("username",{ascending:true}).limit(20);if(error){$("leaderboard").textContent=error.message;return}
  $("leaderboard").innerHTML=data.length?`<table><tr><th>Rank</th><th>Player</th><th>Points</th></tr>${data.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.username)}</td><td>${Number(r.points||0).toLocaleString()}</td></tr>`).join("")}</table>`:"No scores yet today."}finally{leaderboardLoading=false}}
@@ -215,6 +235,8 @@ async function buyTheme(sku){let {error}=await db.rpc("buy_krillion_theme",{p_sk
 async function equipTheme(sku){let {error}=await db.rpc("equip_krillion_theme",{p_sku:sku});if(error){alert(error.message);return}profile.equipped_theme=sku;applyTheme(sku);await loadThemes()};
 $("redeemButton").onclick=async()=>{let code=$("redeemInput").value.trim();if(!code){say("redeemMsg","Enter a code first.");return}say("redeemMsg","Checking code…");let {data,error}=await db.rpc("redeem_krillion_code",{p_code:code});if(error){say("redeemMsg",error.message);return}await refreshMyProfile();say("redeemMsg","Code redeemed! +"+Number(data).toLocaleString()+" coins added.");$("redeemInput").value=""};
 $("refreshBoard").onclick=loadLeaderboard;
+function updateDailyCountdown(){const now=new Date(),next=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+1));const ms=Math.max(0,next-now);const h=String(Math.floor(ms/3600000)).padStart(2,"0"),m=String(Math.floor(ms%3600000/60000)).padStart(2,"0"),sec=String(Math.floor(ms%60000/1000)).padStart(2,"0");const node=$("dailyCountdown");if(node)node.textContent="Next daily set in "+h+":"+m+":"+sec+" UTC";const currentDay=now.toISOString().slice(0,10);if(currentDay!==day)location.reload()}
+updateDailyCountdown();setInterval(updateDailyCountdown,1000);
 setInterval(()=>{if(user)loadLeaderboard()},30000);
 $("signOut").onclick=async()=>{await db.auth.signOut();location.reload()};
 db.auth.getSession().then(({data})=>{if(data.session){user=data.session.user;boot()}});
