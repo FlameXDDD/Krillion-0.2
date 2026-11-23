@@ -21,9 +21,9 @@ KRILLION 4.0 is being developed on the `krillion-4.0` branch. The live `main` br
 - [ ] Audit daily leaderboard aggregation, duplicate submissions, scoring and ranking. Highest valid daily total must rank first.
 - [ ] Improve profile-view navigation and prevent users getting stuck on a public profile.
 - [ ] Add automated and manual regression tests around existing 3.1 features.
-- [ ] Replace the current answer-all-then-submit flow with a one-question-at-a-time experience: show one prompt, accept its answer, save/submit it, then advance to the next prompt with clear progress and confirmation. Preserve already-submitted answers if the player refreshes or loses connection.
-- [ ] Add a visible countdown near the top-left of the main daily-games page showing time remaining until the next daily set/reset (not a generic 24-hour timer). Calculate it from the exact same authoritative day-boundary used to choose the daily questions and store scores; handle rollover correctly.
-- [ ] Make daily questions more randomized and varied while ensuring every player receives the same fair set for that day, with no accidental repeats within a set. Prefer a server-generated or stable day-seeded selection so refreshes do not reshuffle a player's questions.
+- [x] Add a one-question-at-a-time daily answer flow: save each answer before advancing, show question progress, and resume at the first unanswered prompt after refresh. (Committed; browser/database testing still required.)
+- [x] Add a top-left countdown to the next UTC daily reset, using the same UTC date boundary as daily questions and scores; reload on day rollover. (Committed; reset-boundary testing still required.)
+- [x] Add a deterministic day-seeded shuffle of the existing prompt bank so all players get the same varied set for a given UTC day and refreshes do not reshuffle it. (Committed; question-bank quality and duplicate audit still required.)
 
 ## Quick Play
 - [ ] Add a Quick Play option at the bottom of the login screen.
