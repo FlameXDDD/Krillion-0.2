@@ -33,6 +33,7 @@
 @media(max-width:850px){.nav{flex-wrap:nowrap}}
 @media(max-width:850px){.app{grid-template-columns:1fr}.side{position:relative;border-right:0;border-bottom:1px solid var(--line);padding:12px;gap:10px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.profile{max-width:360px}.stats{grid-template-columns:repeat(2,1fr)}.rounds{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.prompts{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}main{padding:18px 13px}}
+@media(max-width:600px){body{font-size:16px}.side{padding:10px;gap:9px}.nav{gap:5px;padding-bottom:3px;scrollbar-width:thin}.nav button{padding:12px 14px;min-height:44px}.side>.profile{max-width:none}.side>.profile .avatar{width:44px;height:44px}main{padding:16px 12px}.panel{padding:14px;margin:12px 0}.actions button,button{min-height:44px}.field input,.field select,input,select{min-height:46px;font-size:16px}.round{min-height:76px}.item,.player-card,.theme-card{flex-wrap:wrap}.item .grow,.player-card .grow,.theme-card .grow{min-width:0;overflow-wrap:anywhere}td,th{padding:9px 7px;font-size:12px}}
 </style></head><body>
 <div id="authView" class="auth panel">
  <div class="brand">KRILLION<span>.</span> 3.1</div><div class="eyebrow">THE DAILY RARITY GAME</div><h1 id="authTitle">Create your account</h1>
@@ -176,8 +177,9 @@ $("submitRound").onclick=async()=>{
  say("gameMsg","Game submitted! Your points and rarity breakdown are saved.");await loadToday();await loadRankings();await loadLeaderboard();drawPrompts()}
  catch(e){say("gameMsg","Submit error: "+e.message+". Refreshing saved answers…");try{await loadToday()}catch(refreshError){say("gameMsg","Submit error: "+e.message+". Reload the page before retrying.")}}
 };
-async function loadLeaderboard(){let {data,error}=await db.from("daily_leaderboard").select("*").eq("game_day",day).limit(20);if(error){$("leaderboard").textContent=error.message;return}
- $("leaderboard").innerHTML=data.length?`<table><tr><th>Rank</th><th>Player</th><th>Points</th></tr>${data.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.username)}</td><td>${r.points}</td></tr>`).join("")}</table>`:"No scores yet today."}
+let leaderboardLoading=false;
+async function loadLeaderboard(){if(leaderboardLoading)return;leaderboardLoading=true;try{let {data,error}=await db.from("daily_leaderboard").select("*").eq("game_day",day).order("points",{ascending:false}).order("username",{ascending:true}).limit(20);if(error){$("leaderboard").textContent=error.message;return}
+ $("leaderboard").innerHTML=data.length?`<table><tr><th>Rank</th><th>Player</th><th>Points</th></tr>${data.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.username)}</td><td>${Number(r.points||0).toLocaleString()}</td></tr>`).join("")}</table>`:"No scores yet today."}finally{leaderboardLoading=false}}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));$(b.dataset.view).classList.add("active");$("pageTitle").textContent=b.textContent.trim();if(b.dataset.view==="history")loadHistory();if(b.dataset.view==="best")loadBest();if(b.dataset.view==="players")loadPlayers();if(b.dataset.view==="shop")loadShop();if(b.dataset.view==="themes")loadThemes();if(b.dataset.view==="inventory")loadInventory();if(b.dataset.view==="profile")loadProfile()});
 async function loadHistory(){let {data,error}=await db.from("answers").select("*").eq("user_id",user.id).order("game_day",{ascending:false}).order("total_points",{ascending:false}).limit(100);$("historyList").innerHTML=error?error.message:data.length?data.map(r=>`<div class="item"><div class="emoji">🎮</div><div class="grow"><b>${esc(r.prompt)}</b><div class="tiny muted">${r.game_day} · Game ${r.game_no} · ${esc(r.answer)}</div></div><b>+${r.total_points}</b></div>`).join(""):"No games played yet."}
@@ -213,6 +215,7 @@ async function buyTheme(sku){let {error}=await db.rpc("buy_krillion_theme",{p_sk
 async function equipTheme(sku){let {error}=await db.rpc("equip_krillion_theme",{p_sku:sku});if(error){alert(error.message);return}profile.equipped_theme=sku;applyTheme(sku);await loadThemes()};
 $("redeemButton").onclick=async()=>{let code=$("redeemInput").value.trim();if(!code){say("redeemMsg","Enter a code first.");return}say("redeemMsg","Checking code…");let {data,error}=await db.rpc("redeem_krillion_code",{p_code:code});if(error){say("redeemMsg",error.message);return}await refreshMyProfile();say("redeemMsg","Code redeemed! +"+Number(data).toLocaleString()+" coins added.");$("redeemInput").value=""};
 $("refreshBoard").onclick=loadLeaderboard;
+setInterval(()=>{if(user)loadLeaderboard()},30000);
 $("signOut").onclick=async()=>{await db.auth.signOut();location.reload()};
 db.auth.getSession().then(({data})=>{if(data.session){user=data.session.user;boot()}});
 db.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_IN"&&!user){user=session.user;boot()}});
