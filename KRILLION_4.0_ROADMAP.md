@@ -21,6 +21,9 @@ KRILLION 4.0 is being developed on the `krillion-4.0` branch. The live `main` br
 - [ ] Audit daily leaderboard aggregation, duplicate submissions, scoring and ranking. Highest valid daily total must rank first.
 - [ ] Improve profile-view navigation and prevent users getting stuck on a public profile.
 - [ ] Add automated and manual regression tests around existing 3.1 features.
+- [ ] Replace the current answer-all-then-submit flow with a one-question-at-a-time experience: show one prompt, accept its answer, save/submit it, then advance to the next prompt with clear progress and confirmation. Preserve already-submitted answers if the player refreshes or loses connection.
+- [ ] Add a visible countdown near the top-left of the main daily-games page showing time remaining until the next daily set/reset (not a generic 24-hour timer). Calculate it from the exact same authoritative day-boundary used to choose the daily questions and store scores; handle rollover correctly.
+- [ ] Make daily questions more randomized and varied while ensuring every player receives the same fair set for that day, with no accidental repeats within a set. Prefer a server-generated or stable day-seeded selection so refreshes do not reshuffle a player's questions.
 
 ## Quick Play
 - [ ] Add a Quick Play option at the bottom of the login screen.
@@ -67,6 +70,8 @@ KRILLION 4.0 is being developed on the `krillion-4.0` branch. The live `main` br
 ## Release and testing
 - [ ] Test sign-up, email confirmation, sign-in and account recovery.
 - [ ] Test daily scoring/ranking with multiple accounts and known score fixtures.
+- [ ] Test one-by-one answer flow, autosave/reconnect recovery and daily countdown at the reset boundary.
+- [ ] Test randomized daily question sets for variety, consistency across players and no within-day duplicates.
 - [ ] Test guest attempt limits and reward claiming across devices/sessions.
 - [ ] Test mutual follows, party invitations and lobby membership.
 - [ ] Test Battle Bash 1–5 players, bot fill, 1v1, ties, duplicate answers and disconnects.
