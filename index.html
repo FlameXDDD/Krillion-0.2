@@ -142,19 +142,44 @@ function say(id,msg){$(id).textContent=msg}
 function promptsForRound(n){return dailyPrompts.slice(n*12,(n+1)*12)}
 function promptStable(n){return promptsForRound(n)}
 function avatarButtons(target,chosen,cb){$(target).innerHTML="";avatars.forEach(a=>{let b=document.createElement("button");b.className="avatarpick"+(a===chosen?" chosen":"");b.textContent=a;b.onclick=()=>cb(a);$(target).appendChild(b)})}
-let chosenAvatar=avatars[0],signupMode=true;
+let chosenAvatar=avatars[0],signupMode=true,authBusy=false;
 avatarButtons("avatarChoices",chosenAvatar,a=>{chosenAvatar=a;avatarButtons("avatarChoices",chosenAvatar,selectSignupAvatar)});
 function selectSignupAvatar(a){chosenAvatar=a;avatarButtons("avatarChoices",chosenAvatar,selectSignupAvatar)}
-$("toggleAuth").onclick=()=>{signupMode=!signupMode;$("authTitle").textContent=signupMode?"Create your account":"Welcome back";$("authSubmit").textContent=signupMode?"Create account":"Sign in";$("usernameField").classList.toggle("hidden",!signupMode);$("avatarField").classList.toggle("hidden",!signupMode);$("toggleAuth").textContent=signupMode?"I already have an account":"Create an account"};
+$("toggleAuth").onclick=()=>{if(authBusy)return;signupMode=!signupMode;$("authTitle").textContent=signupMode?"Create your account":"Welcome back";$("authSubmit").textContent=signupMode?"Create account":"Sign in";$("usernameField").classList.toggle("hidden",!signupMode);$("avatarField").classList.toggle("hidden",!signupMode);$("toggleAuth").textContent=signupMode?"I already have an account":"Create an account";say("authMsg","")};
+function friendlyAuthError(error){
+ const message=String(error?.message||"").toLowerCase();
+ if(message.includes("already registered")||message.includes("already exists")||message.includes("user already"))return "That email already has an account. Switch to Sign in instead.";
+ if(message.includes("invalid login credentials"))return "Email or password is incorrect. Check them and try again.";
+ if(message.includes("invalid email"))return "That email address doesn't look valid. Check the spelling.";
+ if(message.includes("password")&&(message.includes("weak")||message.includes("short")||message.includes("characters")))return "Choose a stronger password with at least 8 characters.";
+ if(message.includes("rate limit")||message.includes("too many requests"))return "Too many attempts in a short time. Wait a little and try again.";
+ if(message.includes("database error saving new user"))return "Supabase couldn't finish creating the account. The username may already be taken, or the signup profile trigger may need checking.";
+ return error?.message||"Something went wrong. Please try again.";
+}
 $("authSubmit").onclick=async()=>{
- say("authMsg","Working…");let email=$("email").value.trim(),password=$("password").value,username=$("username").value.trim();
+ if(authBusy)return;
+ const email=$("email").value.trim().toLowerCase(),password=$("password").value,username=$("username").value.trim();
  if(!email||!password||password.length<8){say("authMsg","Enter an email and a password of at least 8 characters.");return}
- try{if(signupMode){if(!/^[a-zA-Z0-9_]{3,18}$/.test(username)){say("authMsg","Username must be 3–18 characters: letters, numbers or underscores.");return}
- let {data,error}=await db.auth.signUp({email,password,options:{data:{username,avatar:chosenAvatar}}});if(error)throw error;
- if(!data.session){say("authMsg","Account created! Check your email to confirm, then sign in.");return}
- user=data.user;await boot();
- }else{let {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;user=data.user;await boot()}}
- catch(e){say("authMsg",e.message)}
+ if(signupMode&&!/^[a-zA-Z0-9_]{3,18}$/.test(username)){say("authMsg","Username must be 3–18 characters: letters, numbers or underscores.");return}
+ authBusy=true;$("authSubmit").disabled=true;$("toggleAuth").disabled=true;say("authMsg",signupMode?"Creating your account…":"Signing you in…");
+ try{
+  if(signupMode){
+   const {data:existing,error:lookupError}=await db.from("profiles").select("id").eq("username",username).limit(1);
+   if(lookupError)throw lookupError;
+   if(existing&&existing.length){say("authMsg","That username is already taken. Try another one.");return}
+   const {data,error}=await db.auth.signUp({email,password,options:{data:{username,avatar:chosenAvatar}}});
+   if(error)throw error;
+   if(!data.user)throw new Error("Supabase did not return a new account. Please try again.");
+   if(!data.session){say("authMsg","Account created! Check your email for a confirmation link. Once confirmed, come back here and sign in.");return}
+   user=data.user;await boot();
+  }else{
+   const {data,error}=await db.auth.signInWithPassword({email,password});
+   if(error)throw error;
+   if(!data.user)throw new Error("Sign-in did not return an account. Please try again.");
+   user=data.user;await boot();
+  }
+ }catch(e){say("authMsg",friendlyAuthError(e))}
+ finally{authBusy=false;$("authSubmit").disabled=false;$("toggleAuth").disabled=false}
 };
 async function boot(){
  $("authView").classList.add("hidden");$("gameApp").classList.remove("hidden");$("dateLabel").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long",year:"numeric"});$("dayId").textContent=day;
