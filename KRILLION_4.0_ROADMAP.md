@@ -41,6 +41,15 @@ KRILLION 4.0 is being developed on the `krillion-4.0` branch. The live `main` br
 - [ ] Add a profile editor and preview.
 - [ ] Add clear back/close navigation from public profiles.
 
+## Settings and privacy
+- [ ] Add a gear/settings icon at the far top-right of the main game interface, opening a clear settings panel.
+- [ ] Include sound controls and account/login management, with additional sign-in methods only when securely supported.
+- [ ] Add privacy controls for social/profile visibility: friends list, online status, display name, and optional email/contact details.
+- [ ] Email/contact visibility must be OFF by default; only show a contact field publicly when the player deliberately adds it and switches visibility on.
+- [ ] Make privacy settings explicit, easy to understand, and changeable at any time; private settings must be enforced by database/API policies, not just hidden in the UI.
+- [ ] Keep public display name separate from login email; never expose login email by default.
+- [ ] Give players clear control over who can see their friends list and online status.
+
 ## Friends, parties and lobby
 - [ ] Define friendship as a mutual follow (both players follow each other), displayed as Friends.
 - [ ] Add party creation, invitations, join/leave, member list and ready state.
