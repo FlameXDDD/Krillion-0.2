@@ -17,7 +17,7 @@ KRILLION 4.0 is being developed on the `krillion-4.0` branch. The live `main` br
 - [ ] Verify leaderboard aggregation and point totals against actual multi-account test data; sorting alone does not correct an incorrect underlying score total.
 
 ## Bug fixes and core improvements
-- [ ] Investigate and fix intermittent email sign-up/account-creation failures, with clearer confirmation and sign-in states.
+- [x] Harden the sign-up/sign-in UI: prevent duplicate clicks while requests are running, normalize email input, check username availability before signup, and show clearer messages for common auth errors and email-confirmation flow. (Committed; actual Supabase signup/confirmation testing still required.)
 - [ ] Audit daily leaderboard aggregation, duplicate submissions, scoring and ranking. Highest valid daily total must rank first.
 - [ ] Improve profile-view navigation and prevent users getting stuck on a public profile.
 - [ ] Add automated and manual regression tests around existing 3.1 features.
