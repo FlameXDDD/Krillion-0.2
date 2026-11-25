@@ -19,7 +19,7 @@ KRILLION 4.0 is being developed on the `krillion-4.0` branch. The live `main` br
 ## Bug fixes and core improvements
 - [x] Harden the sign-up/sign-in UI: prevent duplicate clicks while requests are running, normalize email input, check username availability before signup, and show clearer messages for common auth errors and email-confirmation flow. (Committed; actual Supabase signup/confirmation testing still required.)
 - [ ] Audit daily leaderboard aggregation, duplicate submissions, scoring and ranking. Highest valid daily total must rank first.
-- [ ] Improve profile-view navigation and prevent users getting stuck on a public profile.
+- [x] Improve public profile navigation with a clear close action and show join date, follower/following counts, mutual-friend status, rank and equipped cosmetics. (Committed; browser/database testing still required.)
 - [ ] Add automated and manual regression tests around existing 3.1 features.
 - [x] Add a one-question-at-a-time daily answer flow: save each answer before advancing, show question progress, and resume at the first unanswered prompt after refresh. (Committed; browser/database testing still required.)
 - [x] Add a top-left countdown to the next UTC daily reset, using the same UTC date boundary as daily questions and scores; reload on day rollover. (Committed; reset-boundary testing still required.)
@@ -33,7 +33,7 @@ KRILLION 4.0 is being developed on the `krillion-4.0` branch. The live `main` br
 - [ ] Define fair guest identity and recovery rules before launch to reduce duplicate claims without collecting unnecessary personal data.
 
 ## Player profiles and customization
-- [ ] Redesign public profiles to avoid blank/empty presentation.
+- [x] Begin profile redesign: richer own-profile overview with lifetime points, answer count, coin balance, join date, cosmetic preview, and a clearer profile editor; public profile cards now show more identity details and have a close action. (Committed; bio, display-name and privacy controls remain planned.)
 - [ ] Display join date, username, lifetime points, rank, stats, avatar, equipped overlays, title cards, name effects, profile background and badges.
 - [ ] Add optional bio.
 - [ ] Add optional contact/social handle fields with private-by-default visibility controls. Do not encourage sharing phone numbers, home addresses, school details or personal email addresses publicly; prefer platform usernames and in-app friend requests.
